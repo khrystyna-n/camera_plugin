@@ -71,7 +71,7 @@ navigator.mediaDevices
   mainContainer.style.filter = 'blur(10px)'
   // Загружаем изображение
   const maskImage = new Image();
-  maskImage.src = 'http://127.0.0.1:5502/images/dog_in_mountain_done.png';
+  maskImage.src = 'images/mixer_kitchen.png';
   maskImage.onload = () => {
     setInterval(() => {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -79,7 +79,7 @@ navigator.mediaDevices
         maskImage,
         canvas.width / 2 - 50,
         canvas.height / 2 - 50,
-        100,
+        200,
         100
       ); // размер и положение изображения на canvas
     }, 10);
@@ -235,7 +235,7 @@ fullscreenBtnReturn.addEventListener("click", function () {
 const ctx2 = canvas2.getContext("2d");
 // Загружаем изображение
 const maskImage2 = new Image();
-maskImage2.src = 'http://127.0.0.1:5502/images/dog_in_mountain_done.png';
+maskImage2.src = 'images/mixer_kitchen.png';
 maskImage2.onload = () => {
   // Отображаем видеопоток на canvas с добавлением изображения
   setInterval(() => {
