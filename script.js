@@ -36,14 +36,13 @@ canvas.style.margin = "auto";
 
 canvas2.style.position = "absolute";
 
-// canvas2.style.left = "0";
-
 canvasContainer.appendChild(canvas);
 document.body.appendChild(canvas2);
 
 canvas.classList.add("canvas");
 canvas2.classList.add("canvas2");
 
+// canvasContainer.style.display = "none";
 video.style.display = "none";
 canvas2.style.display = "none";
 btnReturn.style.display = "none";
@@ -54,7 +53,6 @@ fullscreenVideo.style.display = "none";
 
 const image = document.createElement("img");
 
-// .getUserMedia({ video: { facingMode: { exact: currentCamera } } })
 
 navigator.mediaDevices
   .getUserMedia({ audio: false, video: { facingMode: currentCamera } })
@@ -66,19 +64,22 @@ navigator.mediaDevices
     console.error(error);
   });
 
+const ctx = canvas.getContext("2d");
+const maskImage = new Image();
+
 // function openModal(url) {
-  const ctx = canvas.getContext("2d");
-  mainContainer.style.filter = 'blur(10px)'
+
+  mainContainer.style.filter = "blur(10px)";
   // Загружаем изображение
-  const maskImage = new Image();
-  maskImage.src = 'images/mixer_kitchen.png';
+  // maskImage.src = url;
+  maskImage.src = "images/mixer_kitchen.png";
   maskImage.onload = () => {
     setInterval(() => {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       ctx.drawImage(
         maskImage,
-        canvas.width / 2 - 50,
-        canvas.height / 2 - 50,
+        canvas.width / 2 - 200 / 2,
+        canvas.height / 2 - 100 / 2,
         200,
         100
       ); // размер и положение изображения на canvas
@@ -177,12 +178,12 @@ fullscreenBtn.addEventListener("click", () => {
   fullscreenBtn.style.display = "none";
   btnScreenshot.style.display = "none";
   btnReturn.style.display = "none";
-  fullscreenBtnPlay.disabled = false;
-  fullscreenPause.disabled = false;
-  fullscreenSwitchBtn.disabled = false;
-  fullscreenBtnScreenshot.disabled = false;
-  fullscreenSaveBtn.disabled = true;
-  fullscreenShareBtn.disabled = true;
+  fullscreenBtnPlay.style.display = "block";
+  fullscreenPause.style.display = "block";
+  fullscreenSwitchBtn.style.display = "block";
+  fullscreenBtnScreenshot.style.display = "block";
+  fullscreenSaveBtn.style.display = "none";
+  fullscreenShareBtn.style.display = "none";
   video.pause();
   fullscreenVideo.srcObject = video.srcObject;
   fullscreenVideo.play();
@@ -222,33 +223,48 @@ fullscreenPause.addEventListener("click", function () {
 });
 
 fullscreenBtnReturn.addEventListener("click", function () {
-  fullscreenBtnPlay.disabled = false;
-  fullscreenPause.disabled = false;
-  fullscreenSwitchBtn.disabled = false;
-  fullscreenBtnScreenshot.disabled = false;
-  fullscreenSaveBtn.disabled = true;
-  fullscreenShareBtn.disabled = true;
+  fullscreenBtnPlay.style.display = "block";
+  fullscreenPause.style.display = "block";
+  fullscreenSwitchBtn.style.display = "block";
+  fullscreenBtnScreenshot.style.display = "block";
+  fullscreenSaveBtn.style.display = "none";
+  fullscreenShareBtn.style.display = "none";
   fullscreenVideo.play();
   fullscreenBtnReturn.style.display = "none";
 });
 
-const ctx2 = canvas2.getContext("2d");
-// Загружаем изображение
-const maskImage2 = new Image();
-maskImage2.src = 'images/mixer_kitchen.png';
-maskImage2.onload = () => {
-  // Отображаем видеопоток на canvas с добавлением изображения
-  setInterval(() => {
-    ctx2.drawImage(fullscreenVideo, 0, 0, canvas2.width, canvas2.height);
-    ctx2.drawImage(
-      maskImage2,
-      canvas2.width / 2 - 50,
-      canvas2.height / 2 - 50,
-      100,
-      100
-    ); // размер и положение изображения на canvas
-  }, 10);
+window.addEventListener("resize", openFullscreen);
+
+const drawImageScaled = () => {
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight - 40;
+  canvas2.style.width = viewportWidth + "px";
+  canvas2.style.height = viewportHeight + "px";
+  canvas2.width = window.innerWidth;
+  canvas2.height = window.innerHeight - 40;
 };
+
+const ctx2 = canvas2.getContext("2d");
+const maskImage2 = new Image();
+
+function openFullscreen() {
+  drawImageScaled();
+  // Загружаем изображение
+  maskImage2.src = "images/mixer_kitchen.png";
+  maskImage2.onload = () => {
+    // Отображаем видеопоток на canvas с добавлением изображения
+    setInterval(() => {
+      ctx2.drawImage(fullscreenVideo, 0, 0, canvas2.width, canvas2.height);
+      ctx2.drawImage(
+        maskImage2,
+        canvas2.width / 2 - 250,
+        canvas2.height / 2 - 150,
+        500,
+        300
+      ); // размер и положение изображения на canvas
+    }, 10);
+  };
+}
 
 fullscreenExitBtn.addEventListener("click", () => {
   navigator.mediaDevices
@@ -293,12 +309,12 @@ fullscreenBtnScreenshot.addEventListener("click", () => {
   // Останавливаем видеопоток и скрываем его
   fullscreenVideo.pause();
   fullscreenVideo.style.display = "none";
-  fullscreenBtnPlay.disabled = true;
-  fullscreenPause.disabled = true;
-  fullscreenSwitchBtn.disabled = true;
-  fullscreenBtnScreenshot.disabled = true;
-  fullscreenSaveBtn.disabled = false;
-  fullscreenShareBtn.disabled = false;
+  fullscreenBtnPlay.style.display = "none";
+  fullscreenPause.style.display = "none";
+  fullscreenSwitchBtn.style.display = "none";
+  fullscreenBtnScreenshot.style.display = "none";
+  fullscreenSaveBtn.style.display = "block";
+  fullscreenShareBtn.style.display = "block";
   fullscreenBtnReturn.style.display = "block";
   // Останавливаем отображение видеопотока на canvas
   clearInterval("1000");
@@ -531,6 +547,7 @@ const search = () => {
 const sendData = () => {
   const link = wrapper.childNodes[0].src;
   send(link);
+  // canvasContainer.style.display = "block";
 };
 
 searchBtn.addEventListener("click", search);
@@ -549,3 +566,28 @@ dropdownBtn.addEventListener("click", (event) => {
     iconWrapper.style.display = "none";
   }
 });
+
+function addWatermarkToImage(imageUrl, watermarkUrl, positionX, positionY) {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  const image = new Image();
+  const watermark = new Image();
+  image.crossOrigin = "anonymous";
+  watermark.crossOrigin = "anonymous";
+
+  image.onload = function () {
+    canvas.width = image.width;
+    canvas.height = image.height;
+    context.drawImage(image, 0, 0);
+    
+    watermark.onload = function () {
+      context.globalAlpha = 0.5;
+      context.drawImage(watermark, positionX, positionY);
+      const watermarkedImageUrl = canvas.toDataURL("image/jpeg");
+      console.log(watermarkedImageUrl);
+    };
+    watermark.src = watermarkUrl;
+  };
+
+  image.src = imageUrl;
+}

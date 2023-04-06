@@ -13,7 +13,7 @@ app.get('/', function (req, res) {
 
 app.post('/img/removebg', (req, res) => {
     let data = req.body;
-    data.image = 'http://127.0.0.1:5502/images/dog_in_mountain_done.png';
+    data.image = 'http://127.0.0.1:5502/images/mixer_kitchen.png';
     res.json(data);
 })
 
