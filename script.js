@@ -68,9 +68,13 @@ navigator.mediaDevices
 const ctx = canvas.getContext("2d");
 const maskImage = new Image();
 
+
 // function openModal(url) {
 
   mainContainer.style.filter = "blur(10px)";
+  canvas.width = canvasContainer.clientWidth;
+  canvas.height = canvasContainer.clientHeight;
+
   // Загружаем изображение
   // maskImage.src = url;
   maskImage.src = "images/mixer_kitchen.png";
@@ -79,10 +83,10 @@ const maskImage = new Image();
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       ctx.drawImage(
         maskImage,
-        canvas.width / 2 - 200 / 2,
-        canvas.height / 2 - 100 / 2,
-        200,
-        100
+        canvas.width / 2 - 300 / 2,
+        canvas.height / 2 - 200 / 2,
+        300,
+        200
       ); // размер и положение изображения на canvas
     }, 10);
   };
@@ -150,9 +154,9 @@ btnScreenshot.addEventListener("click", () => {
   ctx.drawImage(maskImage, 0, 0, canvas.width, canvas.height);
   // Отображаем фото на странице
   const imgData = canvas.toDataURL("image/png");
-  maskImage.src = imgData;
-  maskImage.style.display = "block";
-  console.log(maskImage);
+  image.src = imgData;
+  image.style.display = "block";
+
   // Отправляем фото на сервер
   fetch("/upload", {
     method: "POST",
@@ -165,6 +169,7 @@ btnScreenshot.addEventListener("click", () => {
       console.error("Ошибка отправки фото на сервер", error);
     });
 });
+
 
 // FULLSCREEN
 
