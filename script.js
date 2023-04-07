@@ -227,10 +227,12 @@ fullscreenBtn.addEventListener("click", () => {
     .then((stream) => {
       fullscreenVideo.srcObject = stream;
       fullscreenVideo.play();
+      openFullscreen()
     })
     .catch((error) => {
       console.error(error);
     });
+ 
   mainContainer.style.display = "none";
   canvas.style.display = "none";
   canvas2.style.display = "block";
