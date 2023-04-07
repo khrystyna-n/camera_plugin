@@ -27,6 +27,7 @@ const videoContainer = document.getElementById("video-container");
 
 const canvas = document.createElement("canvas");
 const canvas2 = document.createElement("canvas");
+
 canvas.style.position = "absolute";
 canvas.style.top = "0";
 canvas.style.left = "0";
@@ -54,7 +55,6 @@ fullscreenVideo.style.display = "none";
 
 const image = document.createElement("img");
 
-
 navigator.mediaDevices
   .getUserMedia({ audio: false, video: { facingMode: currentCamera } })
   .then((stream) => {
@@ -67,29 +67,30 @@ navigator.mediaDevices
 
 const ctx = canvas.getContext("2d");
 const maskImage = new Image();
-
+const screenImage = document.createElement("img");
+const fullScreenImage = document.createElement("img");
 
 // function openModal(url) {
 
-  mainContainer.style.filter = "blur(10px)";
-  canvas.width = canvasContainer.clientWidth;
-  canvas.height = canvasContainer.clientHeight;
+mainContainer.style.filter = "blur(10px)";
+canvas.width = canvasContainer.clientWidth;
+canvas.height = canvasContainer.clientHeight;
 
-  // Загружаем изображение
-  // maskImage.src = url;
-  maskImage.src = "images/mixer_kitchen.png";
-  maskImage.onload = () => {
-    setInterval(() => {
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      ctx.drawImage(
-        maskImage,
-        canvas.width / 2 - 300 / 2,
-        canvas.height / 2 - 200 / 2,
-        300,
-        200
-      ); // размер и положение изображения на canvas
-    }, 10);
-  };
+// Загружаем изображение
+// maskImage.src = url;
+maskImage.src = "images/mixer_kitchen.png";
+maskImage.onload = () => {
+  setInterval(() => {
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(
+      maskImage,
+      canvas.width / 2 - 300 / 2,
+      canvas.height / 2 - 200 / 2,
+      300,
+      200
+    ); // размер и положение изображения на canvas
+  }, 10);
+};
 // }
 
 //play
@@ -104,18 +105,6 @@ btnPause.addEventListener("click", function () {
   video.pause();
   btnPause.classList.add("is-hidden");
   btnPlay.classList.remove("is-hidden");
-});
-
-btnReturn.addEventListener("click", function () {
-  btnPlay.style.display = "block";
-  btnPause.style.display = "block";
-  switchBtn.style.display = "block";
-  fullscreenBtn.style.display = "block";
-  btnScreenshot.style.display = "block";
-  saveBtn.style.display = "none";
-  shareBtn.style.display = "none";
-  video.play();
-  btnReturn.style.display = "none";
 });
 
 switchBtn.addEventListener("click", () => {
@@ -135,6 +124,21 @@ switchBtn.addEventListener("click", () => {
     });
 });
 
+
+btnReturn.addEventListener("click", function () {
+  canvas.style.display = "block";
+  screenImage.remove();
+  btnPlay.style.display = "block";
+  btnPause.style.display = "block";
+  switchBtn.style.display = "block";
+  fullscreenBtn.style.display = "block";
+  btnScreenshot.style.display = "block";
+  saveBtn.style.display = "none";
+  shareBtn.style.display = "none";
+  video.play();
+  btnReturn.style.display = "none";
+});
+
 btnScreenshot.addEventListener("click", () => {
   // Останавливаем видеопоток и скрываем его
   video.pause();
@@ -149,27 +153,73 @@ btnScreenshot.addEventListener("click", () => {
   btnReturn.style.display = "block";
   // Останавливаем отображение видеопотока на canvas
   clearInterval("1000");
-  // Отображаем нарисованный видеопоток и изображение на canvas
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  ctx.drawImage(maskImage, 0, 0, canvas.width, canvas.height);
-  // Отображаем фото на странице
-  const imgData = canvas.toDataURL("image/png");
-  image.src = imgData;
-  image.style.display = "block";
 
-  // Отправляем фото на сервер
-  fetch("/upload", {
-    method: "POST",
-    body: imgData,
-  })
+  // addWatermarkToImage("images/shoes.webp", "images/safety.png", 0, 0)
+  canvas.style.display = "none";
+
+  screenImage.src = "images/shoes.webp";
+  videoContainer.appendChild(screenImage);
+  screenImage.style.width = "100%";
+  screenImage.style.height = "100%";
+
+
+  // ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // maskImage.src = "images/shoes.webp";
+  // maskImage.onload = () => {
+  //   setInterval(() => {
+  //     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  //     ctx.drawImage(
+  //       maskImage,
+  //       canvas.width / 2 - 300 / 2,
+  //       canvas.height / 2 - 200 / 2,
+  //       300,
+  //       200
+  //     ); // размер и положение изображения на canvas
+  //   }, 10);
+  // };
+
+  const obj = {
+    user_id: "dfgdfg",
+    image: image.src,
+  };
+  const data = JSON.stringify(obj);
+
+  // Опции запроса
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      apikey: "test_apikey",
+    },
+  };
+
+  axios
+    .post("http://localhost:3000/img/removeobj", data, options)
     .then((response) => {
-      console.log("Фото успешно отправлено на сервер");
-    })
-    .catch((error) => {
-      console.error("Ошибка отправки фото на сервер", error);
+      link = response.data;
+      console.log(link.image);
     });
-});
 
+  // // Отображаем нарисованный видеопоток и изображение на canvas
+  // ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  // ctx.drawImage(maskImage, 0, 0, canvas.width, canvas.height);
+  // console.log(maskImage);
+  // // Отображаем фото на странице
+  // const imgData = canvas.toDataURL("image/png");
+  // image.src = imgData;
+  // image.style.display = "block";
+
+  // // Отправляем фото на сервер
+  // fetch("/upload", {
+  //   method: "POST",
+  //   body: imgData,
+  // })
+  //   .then((response) => {
+  //     console.log("Фото успешно отправлено на сервер");
+  //   })
+  //   .catch((error) => {
+  //     console.error("Ошибка отправки фото на сервер", error);
+  //   });
+});
 
 // FULLSCREEN
 
@@ -230,6 +280,8 @@ fullscreenPause.addEventListener("click", function () {
 });
 
 fullscreenBtnReturn.addEventListener("click", function () {
+  canvas2.style.display = "block";
+  fullScreenImage.remove();
   fullscreenBtnPlay.style.display = "block";
   fullscreenPause.style.display = "block";
   fullscreenSwitchBtn.style.display = "block";
@@ -241,7 +293,6 @@ fullscreenBtnReturn.addEventListener("click", function () {
 });
 
 window.addEventListener("resize", openFullscreen);
-
 
 const drawImageScaled = () => {
   const viewportWidth = window.innerWidth;
@@ -276,7 +327,7 @@ function updateCanvas() {
   requestAnimationFrame(updateCanvas);
 }
 
-window.addEventListener('orientationchange', () => {
+window.addEventListener("orientationchange", () => {
   const isPortrait = window.matchMedia("(orientation: portrait)").matches;
   if (isPortrait) {
     fullscreenVideo.width = fullscreenVideo.videoHeight;
@@ -285,8 +336,7 @@ window.addEventListener('orientationchange', () => {
     fullscreenVideo.width = fullscreenVideo.videoWidth;
     fullscreenVideo.height = fullscreenVideo.videoHeight;
   }
-})
-
+});
 
 // function openFullscreen() {
 //   console.log(canvas2.width)
@@ -360,24 +410,32 @@ fullscreenBtnScreenshot.addEventListener("click", () => {
   fullscreenBtnReturn.style.display = "block";
   // Останавливаем отображение видеопотока на canvas
   clearInterval("1000");
+
+  canvas2.style.display = "none";
+
+  fullScreenImage.src = "images/shoes.webp";
+  fullscreenContainer.appendChild(fullScreenImage);
+  fullScreenImage.style.width = "100%";
+  fullScreenImage.style.height = "100%";
+
   // Отображаем нарисованный видеопоток и изображение на canvas
-  ctx2.drawImage(fullscreenVideo, 0, 0, canvas2.width, canvas2.height);
-  ctx2.drawImage(maskImage2, 0, 0, canvas2.width, canvas2.height);
-  // Отображаем фото на странице
-  const imgData = canvas.toDataURL("image/png");
-  image.src = imgData;
-  image.style.display = "block";
-  // Отправляем фото на сервер
-  fetch("/upload", {
-    method: "POST",
-    body: imgData,
-  })
-    .then((response) => {
-      console.log("Фото успешно отправлено на сервер");
-    })
-    .catch((error) => {
-      console.error("Ошибка отправки фото на сервер", error);
-    });
+  // ctx2.drawImage(fullscreenVideo, 0, 0, canvas2.width, canvas2.height);
+  // ctx2.drawImage(maskImage2, 0, 0, canvas2.width, canvas2.height);
+  // // Отображаем фото на странице
+  // const imgData = canvas.toDataURL("image/png");
+  // image.src = imgData;
+  // image.style.display = "block";
+  // // Отправляем фото на сервер
+  // fetch("/upload", {
+  //   method: "POST",
+  //   body: imgData,
+  // })
+  //   .then((response) => {
+  //     console.log("Фото успешно отправлено на сервер");
+  //   })
+  //   .catch((error) => {
+  //     console.error("Ошибка отправки фото на сервер", error);
+    // });
 });
 
 const send = async (url) => {
@@ -588,9 +646,11 @@ const search = () => {
 
 const sendData = () => {
   const link = wrapper.childNodes[0].src;
-  send(link);
-  // canvasContainer.style.display = "block";
-  // videoContainer.style.display = "block";
+  if (link !== undefined) {
+    send(link);
+    // canvasContainer.style.display = "block";
+    // videoContainer.style.display = "block";
+  }
 };
 
 searchBtn.addEventListener("click", search);
@@ -622,11 +682,12 @@ function addWatermarkToImage(imageUrl, watermarkUrl, positionX, positionY) {
     canvas.width = image.width;
     canvas.height = image.height;
     context.drawImage(image, 0, 0);
-    
+
     watermark.onload = function () {
       context.globalAlpha = 0.5;
       context.drawImage(watermark, positionX, positionY);
       const watermarkedImageUrl = canvas.toDataURL("image/jpeg");
+  
       console.log(watermarkedImageUrl);
     };
     watermark.src = watermarkUrl;
@@ -634,3 +695,22 @@ function addWatermarkToImage(imageUrl, watermarkUrl, positionX, positionY) {
 
   image.src = imageUrl;
 }
+
+const shareImageBtn = document.querySelectorAll(".share-btn");
+shareImageBtn.forEach((item) => {
+  item.addEventListener("click", (e) => {
+    e.preventDefault();
+    let links = {
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${newUrl}`,
+      vk: `https://www.facebook.com/sharer/sharer.php?u=${newUrl}`,
+      telegram: `https://www.facebook.com/sharer/sharer.php?u=${newUrl}`,
+      viber: `https://www.facebook.com/sharer/sharer.php?u=${newUrl}`,
+      twitter: `https://www.facebook.com/sharer/sharer.php?u=${newUrl}`,
+    };
+    let eventName = e.target.dataset.name;
+    console.log(links[eventName]);
+    if (newUrl == "") {
+      // window.open(links[eventName], '_blank');
+    }
+  });
+});

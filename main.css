@@ -28,7 +28,6 @@
 .btn:hover {
   cursor: pointer;
   background-color: aquamarine;
-  color: rgb(0, 175, 20);
 }
 
 .button_return {
