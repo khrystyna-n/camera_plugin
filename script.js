@@ -54,6 +54,7 @@ fullscreenVideo.style.display = "none";
 
 const image = document.createElement("img");
 
+
 navigator.mediaDevices
   .getUserMedia({ audio: false, video: { facingMode: currentCamera } })
   .then((stream) => {
@@ -69,22 +70,22 @@ const maskImage = new Image();
 
 // function openModal(url) {
 
-mainContainer.style.filter = "blur(10px)";
-// Загружаем изображение
-// maskImage.src = url;
-maskImage.src = "images/mixer_kitchen.png";
-maskImage.onload = () => {
-  setInterval(() => {
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    ctx.drawImage(
-      maskImage,
-      canvas.width / 2 - 200 / 2,
-      canvas.height / 2 - 100 / 2,
-      200,
-      100
-    ); // размер и положение изображения на canvas
-  }, 10);
-};
+  mainContainer.style.filter = "blur(10px)";
+  // Загружаем изображение
+  // maskImage.src = url;
+  maskImage.src = "images/mixer_kitchen.png";
+  maskImage.onload = () => {
+    setInterval(() => {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(
+        maskImage,
+        canvas.width / 2 - 200 / 2,
+        canvas.height / 2 - 100 / 2,
+        200,
+        100
+      ); // размер и положение изображения на canvas
+    }, 10);
+  };
 // }
 
 //play
@@ -234,59 +235,73 @@ fullscreenBtnReturn.addEventListener("click", function () {
   fullscreenBtnReturn.style.display = "none";
 });
 
+window.addEventListener("resize", openFullscreen);
 
-// function handleOrientationChange() {
-//   // Отримуємо нові розміри вікна після повороту
-//   openFullscreen()
-//   const windowWidth = window.innerWidth;
-//   const windowHeight = window.innerHeight;
-
-//   // Створюємо новий канвас з отриманими розмірами
-//   const canvas = document.createElement('canvas');
-//   canvas.width = windowWidth;
-//   canvas.height = windowHeight;
-
-//   // Додаємо новий канвас на сторінку та видаляємо старий
-//   const oldCanvas = document.querySelector('canvas');
-//   document.body.replaceChild(canvas, oldCanvas);
-// }
 
 const drawImageScaled = () => {
-  // const viewportWidth = window.innerWidth;
-  // const viewportHeight = window.innerHeight - 40;
-  canvas2.style.width = window.innerWidth + "px";
-  canvas2.style.height = window.innerHeight + "px" - 40 + "px";
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight - 40;
+  canvas2.style.width = viewportWidth + "px";
+  canvas2.style.height = viewportHeight + "px";
   canvas2.width = window.innerWidth;
   canvas2.height = window.innerHeight - 40;
-  openFullscreen();
 };
-
-window.addEventListener("resize", drawImageScaled);
-
-window.addEventListener("orientationchange", drawImageScaled);
 
 const ctx2 = canvas2.getContext("2d");
 const maskImage2 = new Image();
 
 function openFullscreen() {
-  console.log(canvas2.width);
-
+  drawImageScaled();
   // Загружаем изображение
   maskImage2.src = "images/mixer_kitchen.png";
   maskImage2.onload = () => {
-    // Отображаем видеопоток на canvas с добавлением изображения
-    setInterval(() => {
-      ctx2.drawImage(fullscreenVideo, 0, 0, canvas2.width, canvas2.height);
-      ctx2.drawImage(
-        maskImage2,
-        canvas2.width / 2 - 250,
-        canvas2.height / 2 - 150,
-        500,
-        300
-      ); // размер и положение изображения на canvas
-    }, 10);
+    requestAnimationFrame(updateCanvas);
   };
 }
+
+function updateCanvas() {
+  ctx2.drawImage(fullscreenVideo, 0, 0, canvas2.width, canvas2.height);
+  ctx2.drawImage(
+    maskImage2,
+    canvas2.width / 2 - 250,
+    canvas2.height / 2 - 150,
+    500,
+    300
+  ); // размер и положение изображения на canvas
+  requestAnimationFrame(updateCanvas);
+}
+
+window.addEventListener('orientationchange', () => {
+  const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+  if (isPortrait) {
+    fullscreenVideo.width = fullscreenVideo.videoHeight;
+    fullscreenVideo.height = fullscreenVideo.videoWidth;
+  } else {
+    fullscreenVideo.width = fullscreenVideo.videoWidth;
+    fullscreenVideo.height = fullscreenVideo.videoHeight;
+  }
+})
+
+
+// function openFullscreen() {
+//   console.log(canvas2.width)
+//   drawImageScaled();
+//   // Загружаем изображение
+//   maskImage2.src = "images/mixer_kitchen.png";
+//   maskImage2.onload = () => {
+//     // Отображаем видеопоток на canvas с добавлением изображения
+//     setInterval(() => {
+//       ctx2.drawImage(fullscreenVideo, 0, 0, canvas2.width, canvas2.height);
+//       ctx2.drawImage(
+//         maskImage2,
+//         canvas2.width / 2 - 250,
+//         canvas2.height / 2 - 150,
+//         500,
+//         300
+//       ); // размер и положение изображения на canvas
+//     }, 10);
+//   };
+// }
 
 fullscreenExitBtn.addEventListener("click", () => {
   navigator.mediaDevices
@@ -602,7 +617,7 @@ function addWatermarkToImage(imageUrl, watermarkUrl, positionX, positionY) {
     canvas.width = image.width;
     canvas.height = image.height;
     context.drawImage(image, 0, 0);
-
+    
     watermark.onload = function () {
       context.globalAlpha = 0.5;
       context.drawImage(watermark, positionX, positionY);
