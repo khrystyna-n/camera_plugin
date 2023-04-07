@@ -43,6 +43,7 @@ canvas.classList.add("canvas");
 canvas2.classList.add("canvas2");
 
 // canvasContainer.style.display = "none";
+// videoContainer.style.display = "none";
 video.style.display = "none";
 canvas2.style.display = "none";
 btnReturn.style.display = "none";
@@ -52,7 +53,6 @@ fullscreenBtnReturn.style.display = "none";
 fullscreenVideo.style.display = "none";
 
 const image = document.createElement("img");
-
 
 navigator.mediaDevices
   .getUserMedia({ audio: false, video: { facingMode: currentCamera } })
@@ -69,22 +69,22 @@ const maskImage = new Image();
 
 // function openModal(url) {
 
-  mainContainer.style.filter = "blur(10px)";
-  // Загружаем изображение
-  // maskImage.src = url;
-  maskImage.src = "images/mixer_kitchen.png";
-  maskImage.onload = () => {
-    setInterval(() => {
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      ctx.drawImage(
-        maskImage,
-        canvas.width / 2 - 200 / 2,
-        canvas.height / 2 - 100 / 2,
-        200,
-        100
-      ); // размер и положение изображения на canvas
-    }, 10);
-  };
+mainContainer.style.filter = "blur(10px)";
+// Загружаем изображение
+// maskImage.src = url;
+maskImage.src = "images/mixer_kitchen.png";
+maskImage.onload = () => {
+  setInterval(() => {
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(
+      maskImage,
+      canvas.width / 2 - 200 / 2,
+      canvas.height / 2 - 100 / 2,
+      200,
+      100
+    ); // размер и положение изображения на canvas
+  }, 10);
+};
 // }
 
 //play
@@ -149,8 +149,9 @@ btnScreenshot.addEventListener("click", () => {
   ctx.drawImage(maskImage, 0, 0, canvas.width, canvas.height);
   // Отображаем фото на странице
   const imgData = canvas.toDataURL("image/png");
-  image.src = imgData;
-  image.style.display = "block";
+  maskImage.src = imgData;
+  maskImage.style.display = "block";
+  console.log(maskImage);
   // Отправляем фото на сервер
   fetch("/upload", {
     method: "POST",
@@ -233,22 +234,43 @@ fullscreenBtnReturn.addEventListener("click", function () {
   fullscreenBtnReturn.style.display = "none";
 });
 
-window.addEventListener("resize", openFullscreen);
+
+// function handleOrientationChange() {
+//   // Отримуємо нові розміри вікна після повороту
+//   openFullscreen()
+//   const windowWidth = window.innerWidth;
+//   const windowHeight = window.innerHeight;
+
+//   // Створюємо новий канвас з отриманими розмірами
+//   const canvas = document.createElement('canvas');
+//   canvas.width = windowWidth;
+//   canvas.height = windowHeight;
+
+//   // Додаємо новий канвас на сторінку та видаляємо старий
+//   const oldCanvas = document.querySelector('canvas');
+//   document.body.replaceChild(canvas, oldCanvas);
+// }
 
 const drawImageScaled = () => {
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight - 40;
-  canvas2.style.width = viewportWidth + "px";
-  canvas2.style.height = viewportHeight + "px";
+  // const viewportWidth = window.innerWidth;
+  // const viewportHeight = window.innerHeight - 40;
+  canvas2.style.width = window.innerWidth + "px";
+  canvas2.style.height = window.innerHeight + "px" - 40 + "px";
   canvas2.width = window.innerWidth;
   canvas2.height = window.innerHeight - 40;
+  openFullscreen();
 };
+
+window.addEventListener("resize", drawImageScaled);
+
+window.addEventListener("orientationchange", drawImageScaled);
 
 const ctx2 = canvas2.getContext("2d");
 const maskImage2 = new Image();
 
 function openFullscreen() {
-  drawImageScaled();
+  console.log(canvas2.width);
+
   // Загружаем изображение
   maskImage2.src = "images/mixer_kitchen.png";
   maskImage2.onload = () => {
@@ -548,6 +570,7 @@ const sendData = () => {
   const link = wrapper.childNodes[0].src;
   send(link);
   // canvasContainer.style.display = "block";
+  // videoContainer.style.display = "block";
 };
 
 searchBtn.addEventListener("click", search);
@@ -579,7 +602,7 @@ function addWatermarkToImage(imageUrl, watermarkUrl, positionX, positionY) {
     canvas.width = image.width;
     canvas.height = image.height;
     context.drawImage(image, 0, 0);
-    
+
     watermark.onload = function () {
       context.globalAlpha = 0.5;
       context.drawImage(watermark, positionX, positionY);
