@@ -124,7 +124,6 @@ switchBtn.addEventListener("click", () => {
     });
 });
 
-
 btnReturn.addEventListener("click", function () {
   canvas.style.display = "block";
   screenImage.remove();
@@ -161,7 +160,6 @@ btnScreenshot.addEventListener("click", () => {
   videoContainer.appendChild(screenImage);
   screenImage.style.width = "100%";
   screenImage.style.height = "100%";
-
 
   // ctx.clearRect(0, 0, canvas.width, canvas.height);
   // maskImage.src = "images/shoes.webp";
@@ -224,6 +222,15 @@ btnScreenshot.addEventListener("click", () => {
 // FULLSCREEN
 
 fullscreenBtn.addEventListener("click", () => {
+  navigator.mediaDevices
+    .getUserMedia({ audio: false, video: { facingMode: currentCamera } })
+    .then((stream) => {
+      fullscreenVideo.srcObject = stream;
+      fullscreenVideo.play();
+    })
+    .catch((error) => {
+      console.error(error);
+    });
   mainContainer.style.display = "none";
   canvas.style.display = "none";
   canvas2.style.display = "block";
@@ -243,7 +250,7 @@ fullscreenBtn.addEventListener("click", () => {
   fullscreenShareBtn.style.display = "none";
   video.pause();
   fullscreenVideo.srcObject = video.srcObject;
-  fullscreenVideo.play();
+  // fullscreenVideo.play();
   fullscreenContainer.style.display = "flex";
   document.documentElement.requestFullscreen();
 });
@@ -306,57 +313,52 @@ const drawImageScaled = () => {
 const ctx2 = canvas2.getContext("2d");
 const maskImage2 = new Image();
 
-function openFullscreen() {
-  drawImageScaled();
-  // Загружаем изображение
-  maskImage2.src = "images/mixer_kitchen.png";
-  maskImage2.onload = () => {
-    requestAnimationFrame(updateCanvas);
-  };
-}
-
-function updateCanvas() {
-  ctx2.drawImage(fullscreenVideo, 0, 0, canvas2.width, canvas2.height);
-  ctx2.drawImage(
-    maskImage2,
-    canvas2.width / 2 - 250,
-    canvas2.height / 2 - 150,
-    500,
-    300
-  ); // размер и положение изображения на canvas
-  requestAnimationFrame(updateCanvas);
-}
-
-window.addEventListener("orientationchange", () => {
-  const isPortrait = window.matchMedia("(orientation: portrait)").matches;
-  if (isPortrait) {
-    fullscreenVideo.width = fullscreenVideo.videoHeight;
-    fullscreenVideo.height = fullscreenVideo.videoWidth;
-  } else {
-    fullscreenVideo.width = fullscreenVideo.videoWidth;
-    fullscreenVideo.height = fullscreenVideo.videoHeight;
-  }
-});
-
 // function openFullscreen() {
-//   console.log(canvas2.width)
 //   drawImageScaled();
 //   // Загружаем изображение
 //   maskImage2.src = "images/mixer_kitchen.png";
 //   maskImage2.onload = () => {
-//     // Отображаем видеопоток на canvas с добавлением изображения
-//     setInterval(() => {
-//       ctx2.drawImage(fullscreenVideo, 0, 0, canvas2.width, canvas2.height);
-//       ctx2.drawImage(
-//         maskImage2,
-//         canvas2.width / 2 - 250,
-//         canvas2.height / 2 - 150,
-//         500,
-//         300
-//       ); // размер и положение изображения на canvas
-//     }, 10);
+//     requestAnimationFrame(updateCanvas);
 //   };
 // }
+
+// function updateCanvas() {
+//   ctx2.drawImage(fullscreenVideo, 0, 0, canvas2.width, canvas2.height);
+
+//   ctx2.drawImage(
+//     maskImage2,
+//     canvas2.width / 2 - 250,
+//     canvas2.height / 2 - 150,
+//     500,
+//     300
+//   ); // размер и положение изображения на canvas
+//   requestAnimationFrame(updateCanvas);
+// }
+
+window.addEventListener("orientationchange", () => {
+
+  openFullscreen();
+});
+
+function openFullscreen() {
+  console.log(canvas2.width);
+  drawImageScaled();
+  // Загружаем изображение
+  maskImage2.src = "images/mixer_kitchen.png";
+  maskImage2.onload = () => {
+    // Отображаем видеопоток на canvas с добавлением изображения
+    setInterval(() => {
+      ctx2.drawImage(fullscreenVideo, 0, 0, canvas2.width, canvas2.height);
+      ctx2.drawImage(
+        maskImage2,
+        canvas2.width / 2 - 250,
+        canvas2.height / 2 - 150,
+        500,
+        300
+      ); // размер и положение изображения на canvas
+    }, 10);
+  };
+}
 
 fullscreenExitBtn.addEventListener("click", () => {
   navigator.mediaDevices
@@ -435,7 +437,7 @@ fullscreenBtnScreenshot.addEventListener("click", () => {
   //   })
   //   .catch((error) => {
   //     console.error("Ошибка отправки фото на сервер", error);
-    // });
+  // });
 });
 
 const send = async (url) => {
@@ -687,7 +689,7 @@ function addWatermarkToImage(imageUrl, watermarkUrl, positionX, positionY) {
       context.globalAlpha = 0.5;
       context.drawImage(watermark, positionX, positionY);
       const watermarkedImageUrl = canvas.toDataURL("image/jpeg");
-  
+
       console.log(watermarkedImageUrl);
     };
     watermark.src = watermarkUrl;
