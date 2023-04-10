@@ -1,3 +1,7 @@
+a {
+  color: #363636 !important;
+}
+
 #video-container {
   position: fixed;
   width: 600px;
@@ -9,6 +13,34 @@
   right: 0px;
 }
 
+[data-name="facebook"] {
+  background: url(./images/icon_fb.svg) no-repeat center;
+  background-size: contain;
+}
+
+[data-name="viber"] {
+  background: url(./images/icon_viber.svg) no-repeat center;
+  background-size: contain;
+}
+
+[data-name="vk"] {
+  background: url(./images/icon_vk.svg) no-repeat center;
+  background-size: contain;
+}
+
+[data-name="telegram"] {
+  background: url(./images/icon_telegram.svg) no-repeat center;
+  background-size: contain;
+}
+
+[data-name="twitter"] {
+  background: url(./images/icon_twitter.svg) no-repeat center;
+  background-size: contain;
+}
+
+.button .icon:first-child:not(:last-child) {
+  margin: 0 !important;
+}
 .button_options {
   position: absolute;
   bottom: 15px;
@@ -78,7 +110,7 @@
   gap: 30px;
   padding: 0 20px;
   box-sizing: border-box;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(126, 126, 126, 0.5);
 }
 
 #fullscreen-controls button {
@@ -90,8 +122,18 @@
   color: white;
 }
 
+#fullscreen-controls a {
+  color: white !important;
+}
+
 #fullscreen-controls button:hover {
   scale: 1.1;
+}
+
+#fullscreen-share-btn {
+  display: flex;
+  padding: 0 0 2px;
+  align-items: center;
 }
 
 #canvas-container {
@@ -108,13 +150,27 @@
 .canvas {
   width: 100%;
   height: 100%;
-  /* object-fit: cover; */
 }
 
 .canvas2 {
   width: 100%;
   height: 95vh;
-  /* object-fit: cover; */
+}
+
+.watermark {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 50px;
+  height: 50px;
+}
+
+.watermarkFullScreen {
+  position: absolute;
+  bottom: 50px;
+  right: 20px;
+  width: 90px;
+  height: 90px;
 }
 
 @media (max-width: 640px) {
@@ -141,6 +197,8 @@
     height: 250px;
   }
   #fullscreen-controls {
+    overflow-x: scroll;
+    overflow-y: hidden;
     gap: 7px;
   }
 }
@@ -330,24 +388,33 @@ footer > p {
 .result-controller {
   display: flex;
 }
-
-.share-btn {
+.show {
   display: flex;
+}
+.share-btn {
+  display: none;
   width: 25px;
   height: 25px;
   align-items: center;
   justify-content: center;
-  margin: 5px 0;
+  margin-left: 20px;
 }
+
+.full-share-btn {
+  display: none;
+  width: 25px;
+  height: 25px;
+  align-items: center;
+  justify-content: center;
+  margin-left: 20px;
+}
+
 .share-dropdown {
   display: flex;
   width: 25px;
   height: 25px;
   align-items: center;
   justify-content: center;
-}
-
-.share-dropdown:hover {
 }
 
 .icon-wrapper {
